@@ -12,7 +12,7 @@ What is here implemented:
 2. Mahony AHRS algorithm 		- Quaternions  	- x-IO
 3. Gyroscope data integration 		- Euler angles 	- Phil Kim - modifed rotation sequence to compare results
 4. Accelerometer data integration 	- Euler angles 	- Phil Kim - modifed g to 1, rotation sequence and added Yaw/Heading/psi calculation
-5. Linear Kalman filter (KF) 		- Euler angles 	- Phil Kim
+5. Linear Kalman filter (KF) 		- Quaternions 	- Phil Kim - with modifications. Beter works without measurements H=0*eye(4)
 
 ### Prerequisites
 

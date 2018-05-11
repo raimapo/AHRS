@@ -18,11 +18,11 @@
 % 13/04/2012    SOH Madgwick    deg2rad function no longer used
 % 06/11/2012    Seb Madgwick    radian to degrees calculation corrected
 %
-% 07/05/2018    Raimondas Pomarnacki     Added Gyro to Euler. Used Phil Kim books, rotation sequence changed to ZYX 
-% 10/05/2018    Raimondas Pomarnacki     Added Accel and Mag to Euler. Used Phil Kim books, rotation sequence changed to ZYX and added YAW/Heading/Psi calculation                                     
+% 07/05/2018    Raimondas Pomarnacki     Added Gyro with Euler. Used Phil Kim books, rotation sequence changed to ZYX 
+% 10/05/2018    Raimondas Pomarnacki     Added Accel and Mag with Euler. Used Phil Kim books, rotation sequence changed to ZYX and added YAW/Heading/Psi calculation                                     
+% 11/05/2018    Raimondas Pomarnacki     Linear Kalman filter with Quaternion                         
 %                                       
-%                                       Linear Kalman filter to Euler
-%                                       Added EKF 9DOF to Euler
+%                                       
 %
 
 
@@ -31,9 +31,10 @@
 addpath('quaternion_library');      % include quaternion library
 addpath('GyroscopeIntegration');    % include Gyroscope integration library
 addpath('AccelerometerMagnetometer');    % include Accelerometer and Magnetometer Integration library
-addpath('EulerEKF');    % include Gyroscope integration library
+addpath('EulerKF');                 % Linear Kalman filter with Euler
+addpath('EulerEKF');                % Extended Kalman filter with Euler
 close all;                          % close all figures
-clear;                              % clear all variables
+clear all;                          % clear all variables
 clc;                                % clear the command terminal
 
 %% Import and plot sensor data
@@ -182,7 +183,7 @@ for t = 1:length(time)
     end
              
     
-    [phi, theta, psi] = EulerAccel(Accelerometer(t, 1), Accelerometer(t, 2), Magnetometer(t,1), Magnetometer(t,2)); 
+    [phi, theta, psi] = EulerAccel(Accelerometer(t, 1), Accelerometer(t, 2), Accelerometer(t, 3), Magnetometer(t,1), Magnetometer(t,2), Magnetometer(t,3)); 
 
     EulerSaved(t, :) = [ phi theta psi ];
 
@@ -198,6 +199,54 @@ plot(time, PhiSaved, 'r');
 plot(time, ThetaSaved, 'g');
 plot(time, PsiSaved, 'b');
 title('Accelerometer and Magnetometer to Euler Angles');
+xlabel('Time (s)');
+ylabel('Angle (deg)');
+legend('\phi', '\theta', '\psi');
+grid on;
+hold off;
+
+%% Process sensor data through Linear Kalman filter with Quaternions algorithm
+
+EulerSaved = zeros(length(time), 3);
+
+for t = 1:length(time)
+    if t > 1
+        dt = (time(t)-time(t-1));
+    else
+        dt = (time(2)-time(1));
+    end
+             
+    %degree/s to rad/s
+    p = Gyroscope(t, 1) * pi/180;
+    q = Gyroscope(t, 2) * pi/180;
+    r = Gyroscope(t, 3) * pi/180;
+    
+    A = eye(4) + dt*1/2*[ 0  -p  -q  -r;
+                          p   0   r  -q;
+                          q  -r   0   p;
+                          r   q  -p   0
+                        ];
+
+    [phi, theta, psi] = EulerAccel(Accelerometer(t, 1), Accelerometer(t, 2), Accelerometer(t, 3), Magnetometer(t,1), Magnetometer(t,2), Magnetometer(t,3));  
+    
+    z = EulerToQuaternion(phi, theta, psi);
+
+    [phi, theta, psi] = EulerKalman(A, z);
+
+    EulerSaved(t, :) = [ phi theta psi ];
+
+end
+
+PhiSaved   = EulerSaved(:, 1) * 180/pi;
+ThetaSaved = EulerSaved(:, 2) * 180/pi;
+PsiSaved   = EulerSaved(:, 3) * 180/pi;
+
+figure('Name', 'Linear Kalman Filter');
+hold on;
+plot(time, PhiSaved, 'r');
+plot(time, ThetaSaved, 'g');
+plot(time, PsiSaved, 'b');
+title('Linear Kalman Filter');
 xlabel('Time (s)');
 ylabel('Angle (deg)');
 legend('\phi', '\theta', '\psi');
