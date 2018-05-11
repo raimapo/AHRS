@@ -5,7 +5,14 @@ Attitude and Heading Reference System using MATLAB as simple as possible
 ## Getting Started
 
 Few implementations of Attitude and Heading Reference System using Matlab in mind to keep it as simple as possible to understand for beginners.
-Basis of Matlab scripts was token from x-IO examples. Additionaly scripts from Phil Kim books also was used. Thank You for authors !
+Basis of Matlab scripts was token from x-IO examples. Additionaly scripts from Phil Kim books also was used. Thank You for the Authors !
+
+What is here implemented:
+1. Madwick AHRS algorithm 		- Quaternions  	- x-IO
+2. Mahony AHRS algorithm 		- Quaternions  	- x-IO
+3. Gyroscope data integration 		- Euler angles 	- Phil Kim - modifed rotation sequence to compare results
+4. Accelerometer data integration 	- Euler angles 	- Phil Kim - modifed g to 1, rotation sequence and added Yaw/Heading/psi calculation
+5. Linear Kalman filter (KF) 		- Euler angles 	- Phil Kim
 
 ### Prerequisites
 
