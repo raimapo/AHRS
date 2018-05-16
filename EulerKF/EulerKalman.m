@@ -9,8 +9,8 @@ persistent firstRun
 if isempty(firstRun)
   H = eye(4);
   
-  Q = 0.01*eye(4);
-  R = 0.1*eye(4);
+  Q = 1*eye(4);
+  R = 10*eye(4);
 
   x = [1 0 0 0]';  
   P = 1*eye(4);

@@ -1,4 +1,4 @@
-function [phi theta psi] = EulerAccel(ax, ay, az, mx, my, mz)
+function [phi theta] = EulerAccel(ax, ay, az, mx, my, mz)
 %
 %
 %g = 9.8;

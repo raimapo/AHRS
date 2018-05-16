@@ -7,12 +7,12 @@ persistent firstRun
 
 
 if isempty(firstRun)
-  H = [ 0 0 0;
-        0 0 0 ];
+  H = [ 1 0 0;
+        0 1 0 ];
   
   Q = [ 0.0001 0      0;
         0      0.0001 0;
-        0      0      0.0001 ];
+        0      0      0.1 ];
      
   R = [  6  0;
          0  6 ];
@@ -33,11 +33,19 @@ K = Pp*H'*inv(H*Pp*H' + R);
 
 x = xp + K*(z - H*xp);
 P = Pp - K*H*Pp;
-
-
+%{
 phi   = x(1);
 theta = x(2);
 psi   = x(3);
+%}
+eul = [x(1) x(2) x(3)];
+rotmZYX = eul2rotm(eul);
+eul = rotm2eul(rotmZYX);
+phi = eul(1);
+theta = eul(2);
+psi = eul(3);
+
+
 
 
 %------------------------------
