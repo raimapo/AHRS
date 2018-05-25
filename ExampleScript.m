@@ -18,10 +18,11 @@
 % 13/04/2012    SOH Madgwick    deg2rad function no longer used
 % 06/11/2012    Seb Madgwick    radian to degrees calculation corrected
 %
-% 07/05/2018    Raimondas Pomarnacki     Added Gyro with Euler. Used Phil Kim books, rotation sequence changed to ZYX 
+% 07/05/2018    Raimondas Pomarnacki     Added Gyro with Euler. Used Phil Kim books, rotation sequence changed to ZYX. 
 % 10/05/2018    Raimondas Pomarnacki     Added Accel and Mag with Euler. Used Phil Kim books, rotation sequence changed to ZYX. Added YAW/Heading/Psi calculation but it's need corrections and not used.                                     
-% 11/05/2018    Raimondas Pomarnacki     Linear Kalman filter with Quaternion 
-% 16/05/2018    Raimondas Pomarnacki     Extended Kalman filter with Euler
+% 11/05/2018    Raimondas Pomarnacki     Linear Kalman filter with Quaternion. 
+% 16/05/2018    Raimondas Pomarnacki     Extended Kalman filter with Euler. Used Phil Kim books
+% 25/05/2018    Raimondas Pomarnacki     Uscended Kalman filter with Euler. Used Phil Kim books
 % 
 %                                       
 %                                       
@@ -35,6 +36,7 @@ addpath('GyroscopeIntegration');    % include Gyroscope integration library
 addpath('AccelerometerMagnetometer');    % include Accelerometer and Magnetometer Integration library
 addpath('EulerKF');                 % Linear Kalman filter with Euler
 addpath('EulerEKF');                % Extended Kalman filter with Euler
+addpath('EulerUKF');                % Unscended Kalman filter with Euler
 close all;                          % close all figures
 clear all;                          % clear all variables
 clc;                                % clear the command terminal
@@ -295,5 +297,46 @@ ylabel('Angle (deg)');
 legend('\phi', '\theta', '\psi');
 grid on;
 hold off;
+
+%% Process sensor data through Unscended Kalman filter with Eulers algorithm
+
+EulerSaved = zeros(length(time), 3);
+
+for t = 1:length(time)
+    if t > 1
+        dt = (time(t)-time(t-1));
+    else
+        dt = (time(2)-time(1));
+    end
+             
+    %degree/s to rad/s
+    p = Gyroscope(t, 1) * pi/180;
+    q = Gyroscope(t, 2) * pi/180;
+    r = Gyroscope(t, 3) * pi/180;
+    
+    [phi_a, theta_a] = EulerAccel(Accelerometer(t, 1), Accelerometer(t, 2), Accelerometer(t, 3), Magnetometer(t,1), Magnetometer(t,2), Magnetometer(t,3));  
+
+    [phi theta psi] = EulerUKF([phi_a theta_a]', [p q r], dt);
+
+    EulerSaved(t, :) = [ phi theta psi ];
+
+end
+
+PhiSaved   = EulerSaved(:, 1) * 180/pi;
+ThetaSaved = EulerSaved(:, 2) * 180/pi;
+PsiSaved   = EulerSaved(:, 3) * 180/pi;
+
+figure('Name', 'Unscended Kalman Filter');
+hold on;
+plot(time, PhiSaved, 'r');
+plot(time, ThetaSaved, 'g');
+plot(time, PsiSaved, 'b');
+title('Unscended Kalman Filter with Eulers algorithm');
+xlabel('Time (s)');
+ylabel('Angle (deg)');
+legend('\phi', '\theta', '\psi');
+grid on;
+hold off;
+
 
 %% End of script
