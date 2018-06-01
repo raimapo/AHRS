@@ -22,12 +22,12 @@
 % 10/05/2018    Raimondas Pomarnacki     Added Accel and Mag with Euler. Used Phil Kim books, rotation sequence changed to ZYX. Added YAW/Heading/Psi calculation but it's need corrections and not used.                                     
 % 11/05/2018    Raimondas Pomarnacki     Linear Kalman filter with Quaternion. 
 % 16/05/2018    Raimondas Pomarnacki     Extended Kalman filter with Euler. Used Phil Kim books
-% 25/05/2018    Raimondas Pomarnacki     Uscended Kalman filter with Euler. Used Phil Kim books
-% 
-%                                       
+% 25/05/2018    Raimondas Pomarnacki     unscented Kalman filter with Euler. Used Phil Kim books
+% 01/06/2018    Raimondas Pomarnacki     Extended Kalman filter with Quaternion. PX4 Autopilit
+% 01/06/2018    Raimondas Pomarnacki     Unscented Kalman filter with Quaternion. TRIAD, Jose Gama - RAHRS libraty for R                                    
 %                                       
 %
-
+ 	
 
 %% Start of script
 
@@ -36,7 +36,9 @@ addpath('GyroscopeIntegration');    % include Gyroscope integration library
 addpath('AccelerometerMagnetometer');    % include Accelerometer and Magnetometer Integration library
 addpath('EulerKF');                 % Linear Kalman filter with Euler
 addpath('EulerEKF');                % Extended Kalman filter with Euler
-addpath('EulerUKF');                % Unscended Kalman filter with Euler
+addpath('EulerUKF');                % Unscented Kalman filter with Euler
+addpath('EKF');                     % Extended Kalman filter
+addpath('UKF');                     % Unscented Kalman filter
 close all;                          % close all figures
 clear all;                          % clear all variables
 clc;                                % clear the command terminal
@@ -332,6 +334,88 @@ plot(time, PhiSaved, 'r');
 plot(time, ThetaSaved, 'g');
 plot(time, PsiSaved, 'b');
 title('Unscended Kalman Filter with Eulers algorithm');
+xlabel('Time (s)');
+ylabel('Angle (deg)');
+legend('\phi', '\theta', '\psi');
+grid on;
+hold off;
+
+%% Process sensor data through Extended Kalman filter with Quternions PX4 autopilot
+
+EulerSaved = zeros(length(time), 3);
+
+AHRSEKF = EKFfilter();
+for t = 1:length(time)
+    if t > 1
+        dt = (time(t)-time(t-1));
+    else
+        dt = (time(2)-time(1));
+    end
+              
+    AHRSEKF.Update(dt, Gyroscope(t,:) * (pi/180), Accelerometer(t,:), Magnetometer(t,:));
+    EulerSaved(t, :) = AHRSEKF.eulerAngles;    
+
+end
+
+PhiSaved   = EulerSaved(:, 1) * (180/pi);
+ThetaSaved = EulerSaved(:, 2) * (180/pi);
+PsiSaved   = EulerSaved(:, 3) * (180/pi);
+
+figure('Name', 'Extended Kalman Filter PX4 Autopilot');
+hold on;
+plot(time, PhiSaved, 'r');
+plot(time, ThetaSaved, 'g');
+plot(time, PsiSaved, 'b');
+title('Extended Kalman Filter PX4 Autopilot');
+xlabel('Time (s)');
+ylabel('Angle (deg)');
+legend('\phi', '\theta', '\psi');
+grid on;
+hold off;
+
+%% Process sensor data through Unscended Kalman filter with Quternions - RAHRS
+
+EulerSaved1 = zeros(length(time), 6);
+
+AHRSUKF = UKFfilter();
+for t = 1:length(time)
+    if t > 1
+        dt = (time(t)-time(t-1));
+    else
+        dt = (time(2)-time(1));
+    end
+              
+    AHRSUKF.Update(dt, Gyroscope(t,:) * (pi/180), Accelerometer(t,:), Magnetometer(t,:));
+    EulerSaved1(t, :) = AHRSUKF.eulerAngles;    
+
+end
+
+PhiSaved   = EulerSaved1(:, 1) * (180/pi);
+ThetaSaved = EulerSaved1(:, 2) * (180/pi);
+PsiSaved   = EulerSaved1(:, 3) * (180/pi);
+
+figure('Name', 'Unscented Kalman Filter - RAHRS');
+hold on;
+plot(time, PhiSaved, 'r');
+plot(time, ThetaSaved, 'g');
+plot(time, PsiSaved, 'b');
+title('Unscented Kalman Filter - RAHRS');
+xlabel('Time (s)');
+ylabel('Angle (deg)');
+legend('\phi', '\theta', '\psi');
+grid on;
+hold off;
+
+PhiSaved   = EulerSaved1(:, 4) * (180/pi);
+ThetaSaved = EulerSaved1(:, 5) * (180/pi);
+PsiSaved   = EulerSaved1(:, 6) * (180/pi);
+
+figure('Name', 'TRIAD - RAHRS');
+hold on;
+plot(time, PhiSaved, 'r');
+plot(time, ThetaSaved, 'g');
+plot(time, PsiSaved, 'b');
+title('TRIAD - RAHRS');
 xlabel('Time (s)');
 ylabel('Angle (deg)');
 legend('\phi', '\theta', '\psi');
