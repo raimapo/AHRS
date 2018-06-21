@@ -14,7 +14,7 @@ What is here implemented:
 2. Mahony AHRS algorithm            - Quaternions  	- x-IO
 3. Gyroscope data integration 		- Euler angles 	- Phil Kim - modifed rotation sequence to compare results
 4. Accelerometer data integration 	- Euler angles 	- Phil Kim - modifed g to 1, rotation sequence and added Yaw/Heading/psi calculation. Yaw data calculations is not used because it's needed corections. 
-5. Linear Kalman filter (KF) 		- Quaternions 	- Phil Kim - with modifications. Learn to use Q and R matrices. Check with Kalaman gain equal to 0 (H=0*eye(4))
+5. Linear Kalman filter (KF) 		- Quaternions 	- Phil Kim - with modifications. Learn to use Q and R matrices.
 6. Extended Kalman filter (EKF)     - Euler angles  - Phil Kim - Learn to make Jacobian and how infuenced Q and R matrices.
 7. Unscented Kalman filter (UKF)    - Euler angles  - Phil Kim
 8. Extended Kalman filter           - Quternions    - PX4 autopilot

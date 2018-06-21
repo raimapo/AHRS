@@ -110,7 +110,7 @@ legend('\phi', '\theta', '\psi');
 hold off;
 
 %% Process sensor data through Mahony algorithm
-
+clearvars -except time Gyroscope Accelerometer Magnetometer
 AHRS = MahonyAHRS('SamplePeriod', 1/256, 'Kp', 0.5);
 
 quaternion = zeros(length(time), 4);
@@ -139,7 +139,7 @@ legend('\phi', '\theta', '\psi');
 hold off;
 
 %% Process sensor data through Gyrocope angular rate integration algorithm
-
+clearvars -except time Gyroscope Accelerometer Magnetometer
 EulerSaved = zeros(length(time), 3);
 
 for t = 1:length(time)
@@ -178,8 +178,9 @@ grid on;
 hold off;
 
 %% Process sensor data through Accelerometer and Magnetometer integration algorithm
-
+clearvars -except time Gyroscope Accelerometer Magnetometer
 EulerSaved = zeros(length(time), 3);
+
 
 for t = 1:length(time)
     if t > 1
@@ -189,7 +190,7 @@ for t = 1:length(time)
     end
              
     
-    [phi, theta] = EulerAccel(Accelerometer(t, 1), Accelerometer(t, 2), Accelerometer(t, 3), Magnetometer(t,1), Magnetometer(t,2), Magnetometer(t,3)); 
+    [phi, theta, psi] = EulerAccel(Accelerometer(t, 1), Accelerometer(t, 2), Accelerometer(t, 3), Magnetometer(t,1), Magnetometer(t,2), Magnetometer(t,3)); 
 
     EulerSaved(t, :) = [ phi theta psi ];
 
@@ -212,7 +213,7 @@ grid on;
 hold off;
 
 %% Process sensor data through Linear Kalman filter with Quaternions algorithm
-
+clearvars -except time Gyroscope Accelerometer Magnetometer
 EulerSaved = zeros(length(time), 3);
 
 for t = 1:length(time)
@@ -233,10 +234,10 @@ for t = 1:length(time)
                           r   q  -p   0
                         ];
 
-    [phi, theta] = EulerAccel(Accelerometer(t, 1), Accelerometer(t, 2), Accelerometer(t, 3), Magnetometer(t,1), Magnetometer(t,2), Magnetometer(t,3));  
+    [phi, theta, psi] = EulerAccel(Accelerometer(t, 1), Accelerometer(t, 2), Accelerometer(t, 3), Magnetometer(t,1), Magnetometer(t,2), Magnetometer(t,3));  
     
     %z = EulerToQuaternion(phi, theta, psi);
-    z = eul2quat([phi theta 0], 'ZYX')';
+    z = eul2quat([phi theta psi], 'ZYX')';
 
     [phi, theta, psi] = EulerKalman(A, z);
 
@@ -261,7 +262,7 @@ grid on;
 hold off;
 
 %% Process sensor data through Extended Kalman filter with Eulers algorithm
-
+clearvars -except time Gyroscope Accelerometer Magnetometer
 EulerSaved = zeros(length(time), 3);
 
 for t = 1:length(time)
@@ -301,7 +302,7 @@ grid on;
 hold off;
 
 %% Process sensor data through Unscended Kalman filter with Eulers algorithm
-
+clearvars -except time Gyroscope Accelerometer Magnetometer
 EulerSaved = zeros(length(time), 3);
 
 for t = 1:length(time)
@@ -341,7 +342,7 @@ grid on;
 hold off;
 
 %% Process sensor data through Extended Kalman filter with Quternions PX4 autopilot
-
+clearvars -except time Gyroscope Accelerometer Magnetometer
 EulerSaved = zeros(length(time), 3);
 
 AHRSEKF = EKFfilter();
@@ -374,7 +375,7 @@ grid on;
 hold off;
 
 %% Process sensor data through Unscended Kalman filter with Quternions - RAHRS
-
+clearvars -except time Gyroscope Accelerometer Magnetometer
 EulerSaved1 = zeros(length(time), 6);
 
 AHRSUKF = UKFfilter();
