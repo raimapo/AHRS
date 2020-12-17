@@ -18,8 +18,8 @@ What is here implemented:
 6. Extended Kalman filter (EKF)     - Euler angles  - Phil Kim - Learn to make Jacobian and how infuenced Q and R matrices.
 7. Unscented Kalman filter (UKF)    - Euler angles  - Phil Kim
 8. Extended Kalman filter           - Quternions    - PX4 autopilot
-9. Unscented Kalman filter          - Quaternion    - Jose Gama - RAHRS libraty for R           
-10. TRIAD                           - Euler angles  - Jose Gama - RAHRS libraty for R        
+9. Unscented Kalman filter          - Quaternion    - Jose Gama - RAHRS library for R           
+10. TRIAD                           - Euler angles  - Jose Gama - RAHRS library for R        
 
 
 ### Prerequisites
